@@ -28,8 +28,8 @@ public class CustomUserDetailService implements UserDetailsService {
     }
 
     private UserDetails createUserDetails(User user) {
-        List<SimpleGrantedAuthority> authorities = user.getRoles().stream()
-                .map(role -> new SimpleGrantedAuthority("ROLE_" + role.getRole())).toList();
+        List<SimpleGrantedAuthority> authorities = List.of(
+                new SimpleGrantedAuthority("ROLE_" + user.getRole().name()));
         return new CustomUser(user.getId(), user.getLoginId(), user.getPassword(), authorities);
     }
 }

@@ -1,7 +1,9 @@
 package org.topl.spring.common.exception;
 
-import org.springframework.http.HttpStatus;
-import org.springframework.security.authentication.BadCredentialsException;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -11,44 +13,46 @@ import java.util.HashMap;
 import java.util.Map;
 
 @RestControllerAdvice
+@Slf4j
 public class GlobalExceptionHandler {
 
-    @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ApiResponse<?> methodArgumentNotValidException(MethodArgumentNotValidException ex) {
-        Map<String, String> errors = new HashMap<>();
-        ex.getBindingResult().getFieldErrors().forEach((error) -> {
-            String fieldName = error.getField();
-            String errorMessage = error.getDefaultMessage();
-            errors.put(fieldName, errorMessage != null ? errorMessage : "Invalid Input");
-        });
-
-        return ApiResponse.error(HttpStatus.BAD_REQUEST, errors);
+    @ExceptionHandler(HttpMessageNotReadableException.class)
+    public ResponseEntity<ApiResponse<?>> handleHttpMessageNotReadableException(HttpMessageNotReadableException e) {
+        log.error("JSON parsing error: {}", e.getMessage());
+        return ResponseEntity
+                .badRequest()
+                .body(ApiResponse.error("INVALID_JSON", "잘못된 JSON 형식입니다."));
     }
 
-    @ExceptionHandler(InvalidInputException.class)
-    public ApiResponse<?> invalidInputException(InvalidInputException ex) {
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public ResponseEntity<ApiResponse<?>> handleValidationException(MethodArgumentNotValidException e) {
         Map<String, String> errors = new HashMap<>();
-        String errorMessage = ex.getMessage();
-        errors.put(ex.getFieldName(), errorMessage != null ? errorMessage : "Invalid Input");
+        e.getBindingResult().getAllErrors().forEach(error -> {
+            String fieldName = ((FieldError) error).getField();
+            String errorMessage = error.getDefaultMessage();
+            errors.put(fieldName, errorMessage);
+        });
+        log.error("Validation failed: {}", errors);
+        return ResponseEntity
+                .badRequest()
+                .body(ApiResponse.error("VALIDATION_FAILED", "입력값 검증에 실패했습니다. " + errors));
+    }
 
-        return ApiResponse.error(HttpStatus.BAD_REQUEST, errors);
+    @ExceptionHandler(BusinessException.class)
+    public ResponseEntity<ApiResponse<?>> handleBusinessException(BusinessException e) {
+        ErrorCode errorCode = e.getErrorCode();
+        log.error("BusinessException: {}", e.getMessage());
+        return ResponseEntity
+                .status(errorCode.getStatus())
+                .body(ApiResponse.error(errorCode.getCode(), e.getMessage()));
     }
 
     @ExceptionHandler(Exception.class)
-    public ApiResponse<?> defaultException(Exception ex) {
-        Map<String, String> errors = new HashMap<>();
-        String errorMessage = ex.getMessage();
-        errors.put("미처리 예외", errorMessage != null ? errorMessage : "Error");
-
-        return ApiResponse.error(HttpStatus.BAD_REQUEST, errors);
-    }
-
-    @ExceptionHandler(BadCredentialsException.class)
-    public ApiResponse<?> badCredentialsException(BadCredentialsException e) {
-        Map<String, String> errors = new HashMap<>();
-        String errorMessage = e.getMessage();
-        errors.put("로그인 실패", errorMessage);
-
-        return ApiResponse.error(HttpStatus.BAD_REQUEST, errors);
+    public ResponseEntity<ApiResponse<?>> handleException(Exception e) {
+        log.error("Unhandled exception: {}", e.getMessage());
+        return ResponseEntity
+                .status(ErrorCode.INTERNAL_SERVER_ERROR.getStatus())
+                .body(ApiResponse.error(ErrorCode.INTERNAL_SERVER_ERROR.getCode(),
+                        ErrorCode.INVALID_INPUT.getMessage()));
     }
 }

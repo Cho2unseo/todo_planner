@@ -28,4 +28,13 @@ public class TodoResponseDto {
                     .build();
         }
     }
+
+    @Getter
+    @NoArgsConstructor(access = AccessLevel.PROTECTED)
+    @AllArgsConstructor(access = AccessLevel.PRIVATE)
+    @Builder
+    public static class TodoListDto {
+        private Long todoId;
+        private String content;
+    }
 }

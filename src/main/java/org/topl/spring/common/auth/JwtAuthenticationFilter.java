@@ -10,6 +10,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.util.StringUtils;
+import org.topl.spring.common.exception.ErrorCode;
 import org.topl.spring.common.response.ApiResponse;
 
 import java.io.IOException;
@@ -39,7 +40,7 @@ public class JwtAuthenticationFilter extends GenericFilter {
             Map<String, String> errors = new HashMap<>();
             errors.put("token", e.getMessage());
 
-            ApiResponse<?> errorResponse = ApiResponse.error(HttpStatus.UNAUTHORIZED, errors);
+            ApiResponse<?> errorResponse = ApiResponse.error(ErrorCode.UNAUTHORIZED);
 
             response.getWriter().write(new ObjectMapper().writeValueAsString(errorResponse));
         }

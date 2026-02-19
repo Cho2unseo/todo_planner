@@ -7,7 +7,7 @@ import org.topl.spring.user.entity.User;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "`todo`")
+@Table(name = "todo")
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor

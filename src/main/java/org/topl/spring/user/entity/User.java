@@ -1,20 +1,15 @@
 package org.topl.spring.user.entity;
 
 import jakarta.persistence.*;
-import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.topl.spring.todo.entity.Todo;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
 
 @Entity
-@Table(name = "`user`")
+@Table(name = "user")
 @Getter
 @NoArgsConstructor
-
 public class User {
 
     @Id
@@ -28,31 +23,21 @@ public class User {
     private String password;
 
     @Column(nullable = false, length = 10)
-    private String name;
+    private String nickname;
 
     @Column(nullable = false)
     @Temporal(TemporalType.DATE)
     private LocalDate birthDate;
 
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "user")
-    private List<UserRole> roles;
+    @Column(nullable = false)
+    @Enumerated(EnumType.STRING)
+    private UserRole role;
 
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Todo> todos;
-
-    @Builder
-    private User(Long id, String loginId, String password, String name, LocalDate birthDate) {
-        this.id = id;
+    public User(String loginId, String password, String nickname, LocalDate birthDate, UserRole role) {
         this.loginId = loginId;
         this.password = password;
-        this.name = name;
+        this.nickname = nickname;
         this.birthDate = birthDate;
-        this.roles = null;
-    }
-
-    public void addTodo(Todo todo) {
-        if (todos == null) todos = new ArrayList<>();
-        todos.add(todo);
-        todo.setUser(this);
+        this.role = role == null ? UserRole.USER : role;
     }
 }
