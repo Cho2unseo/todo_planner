@@ -1,17 +1,17 @@
 package org.topl.spring.todo.entity;
 
 import jakarta.persistence.*;
-import lombok.*;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.topl.spring.user.entity.User;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 
 @Entity
 @Table(name = "todo")
 @Getter
 @NoArgsConstructor
-@AllArgsConstructor
-@Builder
 public class Todo {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -24,10 +24,10 @@ public class Todo {
     private Boolean isDone;
 
     @Column
-    private LocalDateTime startDate;
+    private LocalDate startDate;
 
     @Column
-    private LocalDateTime endDate;
+    private LocalDate endDate;
 
     @Column(length = 500)
     private String memo;
@@ -36,4 +36,13 @@ public class Todo {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
+
+    public Todo(String content, LocalDate startDate, LocalDate endDate, String memo, User user) {
+        this.content = content;
+        this.isDone = false;
+        this.startDate = startDate;
+        this.endDate = endDate;
+        this.memo = memo;
+        this.user = user;
+    }
 }
