@@ -8,10 +8,13 @@ public enum ErrorCode {
 
     INTERNAL_SERVER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "E001", "서버 에러가 발생했습니다."),
     INVALID_INPUT(HttpStatus.BAD_REQUEST, "E002", "잘못된 요청입니다."),
-    DUPLICATE_ID(HttpStatus.BAD_REQUEST, "E003", "이미 존재하는 ID입니다."),
-    DUPLICATE_NICKNAME(HttpStatus.BAD_REQUEST, "E004", "이미 존재하는 닉네임입니다."),
-    USER_NOT_FOUND(HttpStatus.NOT_FOUND, "E005", "존재하지 않는 사용자입니다."),
-    UNAUTHORIZED(HttpStatus.UNAUTHORIZED, "E006", "인증이 필요합니다.");
+    UNAUTHORIZED(HttpStatus.UNAUTHORIZED, "E003", "인증이 필요합니다."),
+
+    DUPLICATE_ID(HttpStatus.BAD_REQUEST, "U001", "이미 존재하는 ID입니다."),
+    DUPLICATE_NICKNAME(HttpStatus.BAD_REQUEST, "U002", "이미 존재하는 닉네임입니다."),
+    USER_NOT_FOUND(HttpStatus.NOT_FOUND, "U003", "존재하지 않는 사용자입니다."),
+
+    TODO_NOT_FOUND(HttpStatus.NOT_FOUND, "T001", "존재하지 않는 할 일입니다.");
 
     private final HttpStatus status;
     private final String code;

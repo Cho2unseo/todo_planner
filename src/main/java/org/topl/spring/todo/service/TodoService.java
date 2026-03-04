@@ -6,6 +6,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.topl.spring.common.exception.BusinessException;
 import org.topl.spring.common.exception.ErrorCode;
 import org.topl.spring.todo.dto.request.TodoRequest;
+import org.topl.spring.todo.dto.request.UpdateTodoRequest;
 import org.topl.spring.todo.dto.response.TodoResponse;
 import org.topl.spring.todo.entity.Todo;
 import org.topl.spring.todo.repository.TodoRepository;
@@ -21,20 +22,43 @@ public class TodoService {
     private final UserRepository userRepository;
     private final TodoRepository todoRepository;
 
+    @Transactional
     public Todo createTodo(TodoRequest request, Long userId) {
         User user = getUser(userId);
-        Todo todo = new Todo(request.content(), request.startDate(), request.endDate(), request.memo(), user);
+        Todo todo = new Todo(request.content(), request.startTime(), request.endTime(), request.memo(), user);
         return todoRepository.save(todo);
     }
 
     public List<TodoResponse> getTodo(Long userId) {
-        return todoRepository.findByUserId(userId).stream()
-                .map(todo -> TodoResponse.from(todo.getTodoId(), todo.getContent(), todo.getIsDone(), todo.getStartDate(), todo.getEndDate()))
+        return todoRepository.findByUserIdAndDeletedAtIsNull(userId).stream()
+                .map(todo -> TodoResponse.from(todo.getTodoId(), todo.getContent(), todo.getIsDone(), todo.getStartTime(), todo.getEndTime(), todo.getActualStartTime(), todo.getEndTime(), todo.getMemo()))
                 .toList();
+    }
+
+    public TodoResponse getTodoDetail(Long userId, Long todoId) {
+        Todo todo = getTodo(userId, todoId);
+        return TodoResponse.from(todo.getTodoId(), todo.getContent(), todo.getIsDone(), todo.getStartTime(), todo.getEndTime(), todo.getActualStartTime(), todo.getActualEndTime(), todo.getMemo());
+    }
+
+    @Transactional
+    public TodoResponse updateTodo(Long userId, Long todoId, UpdateTodoRequest request) {
+        Todo todo = getTodo(userId, todoId);
+        todo.update(request);
+        return TodoResponse.from(todo.getTodoId(), todo.getContent(), todo.getIsDone(), todo.getStartTime(), todo.getEndTime(), todo.getActualStartTime(), todo.getActualEndTime(), todo.getMemo());
+    }
+
+    public void deleteTodo(Long userId, Long todoId) {
+        Todo todo = getTodo(userId, todoId);
+        todo.markDeleted(userId);
     }
 
     private User getUser(Long userId) {
         return userRepository.findById(userId)
                 .orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND));
+    }
+
+    private Todo getTodo(Long userId, Long todoId) {
+        return todoRepository.findByUserIdAndTodoIdAndDeletedAtIsNull(userId, todoId)
+                .orElseThrow(() -> new BusinessException(ErrorCode.TODO_NOT_FOUND));
     }
 }

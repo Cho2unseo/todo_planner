@@ -2,11 +2,13 @@ package org.topl.spring.todo.dto.request;
 
 import java.time.LocalDateTime;
 
-public record TodoRequest(
+public record UpdateTodoRequest(
         String content,
         Boolean isDone,
         LocalDateTime startTime,
         LocalDateTime endTime,
-        String memo
+        String memo,
+        LocalDateTime actualStartTime,
+        LocalDateTime actualEndTime
 ) {
 }

@@ -4,15 +4,17 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.topl.spring.common.Timestamped;
+import org.topl.spring.todo.dto.request.UpdateTodoRequest;
 import org.topl.spring.user.entity.User;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "todo")
 @Getter
 @NoArgsConstructor
-public class Todo {
+public class Todo extends Timestamped {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long todoId;
@@ -24,10 +26,16 @@ public class Todo {
     private Boolean isDone;
 
     @Column
-    private LocalDate startDate;
+    private LocalDateTime startTime;
 
     @Column
-    private LocalDate endDate;
+    private LocalDateTime endTime;
+
+    @Column
+    private LocalDateTime actualStartTime;
+
+    @Column
+    private LocalDateTime actualEndTime;
 
     @Column(length = 500)
     private String memo;
@@ -37,12 +45,22 @@ public class Todo {
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
-    public Todo(String content, LocalDate startDate, LocalDate endDate, String memo, User user) {
+    public Todo(String content, LocalDateTime startTime, LocalDateTime endTime, String memo, User user) {
         this.content = content;
         this.isDone = false;
-        this.startDate = startDate;
-        this.endDate = endDate;
+        this.startTime = startTime;
+        this.endTime = endTime;
         this.memo = memo;
         this.user = user;
+    }
+
+    public void update(UpdateTodoRequest request) {
+        if (request.content() != null) this.content = request.content();
+        if (request.isDone() != null) this.isDone = request.isDone();
+        if (request.startTime() != null) this.startTime = request.startTime();
+        if (request.endTime() != null) this.endTime = request.endTime();
+        if (request.actualStartTime() != null) this.actualStartTime = request.actualStartTime();
+        if (request.actualEndTime() != null) this.actualEndTime = request.actualEndTime();
+        if (request.memo() != null) this.memo = request.memo();
     }
 }
