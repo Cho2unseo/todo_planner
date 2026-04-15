@@ -7,6 +7,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import org.topl.spring.common.auth.CustomUser;
 import org.topl.spring.common.response.ApiResponse;
+import org.topl.spring.todo.dto.request.CompleteTodoRequest;
 import org.topl.spring.todo.dto.request.TodoRequest;
 import org.topl.spring.todo.dto.request.UpdateTodoRequest;
 import org.topl.spring.todo.dto.response.TodoResponse;
@@ -52,6 +53,15 @@ public class TodoController {
             @RequestBody UpdateTodoRequest request) {
         TodoResponse todo = todoService.updateTodo(user.getUserId(), todoId, request);
         return ResponseEntity.ok(ApiResponse.success(todo, "할 일 수정 완료"));
+    }
+
+    @PatchMapping("/{todoId}/done")
+    public ResponseEntity<ApiResponse<Void>> completeTodo(
+            @AuthenticationPrincipal CustomUser user,
+            @PathVariable Long todoId,
+            @RequestBody CompleteTodoRequest request) {
+        todoService.completeTodo(user.getUserId(), todoId, request);
+        return ResponseEntity.noContent().build();
     }
 
     @DeleteMapping("/{todoId}")

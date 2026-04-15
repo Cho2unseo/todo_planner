@@ -5,10 +5,12 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.topl.spring.common.Timestamped;
+import org.topl.spring.todo.dto.request.CompleteTodoRequest;
 import org.topl.spring.todo.dto.request.UpdateTodoRequest;
 import org.topl.spring.user.entity.User;
 
 import java.time.LocalDateTime;
+import java.util.Date;
 
 @Entity
 @Table(name = "todo")
@@ -62,5 +64,13 @@ public class Todo extends Timestamped {
         if (request.actualStartTime() != null) this.actualStartTime = request.actualStartTime();
         if (request.actualEndTime() != null) this.actualEndTime = request.actualEndTime();
         if (request.memo() != null) this.memo = request.memo();
+    }
+
+    public void completeTodo(CompleteTodoRequest request) {
+        if (request.actualStartTime() != null) this.actualStartTime = request.actualStartTime();
+        if (request.actualEndTime() != null) this.actualEndTime = request.actualEndTime();
+        else this.actualEndTime = LocalDateTime.now();
+        if (request.memo() != null) this.memo = request.memo();
+        this.isDone = true;
     }
 }

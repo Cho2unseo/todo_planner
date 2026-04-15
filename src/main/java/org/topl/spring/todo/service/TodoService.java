@@ -5,6 +5,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.topl.spring.common.exception.BusinessException;
 import org.topl.spring.common.exception.ErrorCode;
+import org.topl.spring.todo.dto.request.CompleteTodoRequest;
 import org.topl.spring.todo.dto.request.TodoRequest;
 import org.topl.spring.todo.dto.request.UpdateTodoRequest;
 import org.topl.spring.todo.dto.response.TodoResponse;
@@ -47,6 +48,13 @@ public class TodoService {
         return TodoResponse.from(todo.getTodoId(), todo.getContent(), todo.getIsDone(), todo.getStartTime(), todo.getEndTime(), todo.getActualStartTime(), todo.getActualEndTime(), todo.getMemo());
     }
 
+    @Transactional
+    public void completeTodo(Long userId, Long todoId, CompleteTodoRequest request) {
+        Todo todo = getTodo(userId, todoId);
+        todo.completeTodo(request);
+    }
+
+    @Transactional
     public void deleteTodo(Long userId, Long todoId) {
         Todo todo = getTodo(userId, todoId);
         todo.markDeleted(userId);
