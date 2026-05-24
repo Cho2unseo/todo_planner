@@ -11,6 +11,7 @@ import org.topl.spring.common.auth.TokenInfo;
 import org.topl.spring.common.response.ApiResponse;
 import org.topl.spring.user.dto.request.LoginRequest;
 import org.topl.spring.user.dto.request.SignupRequest;
+import org.topl.spring.user.dto.request.UpdateUserRequest;
 import org.topl.spring.user.dto.response.LoginResponse;
 import org.topl.spring.user.dto.response.SignupResponse;
 import org.topl.spring.user.dto.response.UserResponse;
@@ -43,5 +44,21 @@ public class UserController {
         Long userId = user.getUserId();
         UserResponse response = userService.userInfo(userId);
         return ResponseEntity.ok(ApiResponse.success(response, "내 정보 조회 완료"));
+    }
+
+    @PatchMapping("/me")
+    public ResponseEntity<ApiResponse<UserResponse>> updateMyInfo(@AuthenticationPrincipal CustomUser user,
+                                                                  @Valid @RequestBody UpdateUserRequest request) {
+        Long userId = user.getUserId();
+        UserResponse response = userService.updateUser(userId, request);
+        return ResponseEntity.ok(ApiResponse.success(response, "내 정보 업데이트 완료"));
+    }
+
+    @PostMapping("/logout")
+    public ResponseEntity<ApiResponse<Void>> logout(@AuthenticationPrincipal CustomUser user) {
+        Long userId = user.getUserId();
+        // TODO
+        // userService.logout(userId);
+        return ResponseEntity.noContent().build();
     }
 }

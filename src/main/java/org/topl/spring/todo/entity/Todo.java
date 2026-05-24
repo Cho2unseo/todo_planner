@@ -10,7 +10,6 @@ import org.topl.spring.todo.dto.request.UpdateTodoRequest;
 import org.topl.spring.user.entity.User;
 
 import java.time.LocalDateTime;
-import java.util.Date;
 
 @Entity
 @Table(name = "todo")

@@ -13,6 +13,7 @@ import org.topl.spring.common.exception.BusinessException;
 import org.topl.spring.common.exception.ErrorCode;
 import org.topl.spring.user.dto.request.LoginRequest;
 import org.topl.spring.user.dto.request.SignupRequest;
+import org.topl.spring.user.dto.request.UpdateUserRequest;
 import org.topl.spring.user.dto.response.UserResponse;
 import org.topl.spring.user.entity.User;
 import org.topl.spring.user.repository.UserRepository;
@@ -47,6 +48,13 @@ public class UserService {
     public UserResponse userInfo(Long userId) {
         User user = userRepository.findById(userId).orElseThrow(() ->
                 new BusinessException(ErrorCode.USER_NOT_FOUND));
+        return UserResponse.from(user);
+    }
+
+    public UserResponse updateUser(Long userId, UpdateUserRequest request) {
+        User user = userRepository.findById(userId).orElseThrow(() ->
+                new BusinessException(ErrorCode.USER_NOT_FOUND));
+        user.update(request.nickname(), request.birthDate());
         return UserResponse.from(user);
     }
 }

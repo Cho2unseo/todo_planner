@@ -41,4 +41,9 @@ public class User extends Timestamped {
         this.birthDate = birthDate;
         this.role = role == null ? UserRole.USER : role;
     }
+
+    public void update(String nickname, LocalDate birthDate) {
+        if (nickname != null) this.nickname = nickname;
+        if (birthDate != null) this.birthDate = birthDate;
+    }
 }
